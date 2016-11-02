@@ -34,15 +34,6 @@ _.forEach(followedBy, (followers, userId) => {
   data[userId]["followedBy"] = followers;
 });
 
-function getFollowsList(user) {
-  if(user && user.follows && user.follows.length > 0) {
-    return user.follows.map(userId => data[userId]).filter(user => user);
-  }
-  else {
-    return null;
-  }
-}
-
 function userForId(userId) {
   return data[userId];
 }
