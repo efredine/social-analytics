@@ -57,4 +57,11 @@ function printUsers() {
   _.forEach(data, (user, userId) => printUser(user, userId));
 }
 
+function mostFollowers() {
+  return _.reduce(data, (a, b) => a.followedBy.length > b.followedBy.length ? a : b);
+}
+
+console.log(data);
 printUsers();
+var mostFollowed = mostFollowers();
+console.log("Most followers:", mostFollowed.name, mostFollowed.followedBy.length);
