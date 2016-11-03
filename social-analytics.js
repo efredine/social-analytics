@@ -39,21 +39,25 @@ function userForId(userId) {
   return data[userId];
 }
 
+function usersFromIdList(userIds){
+  return userIds
+    .map(id => Object.assign({userId: id}, userForId(id)));
+}
+
 function formatUser(name, id) {
   return `${name}(${id})`;
 }
 
-function userListString(userIds) {
-  return userIds
-    .map(id => Object.assign({userId: id}, userForId(id)))
+function formatUserIdList(userIds) {
+  return usersFromIdList(userIds)
     .map(u => formatUser(u.name, u.userId))
     .join(", ");
 }
 
 function printUser(user, userId) {
   console.log(`${formatUser(user.name, userId)} ----------------`);
-  let follows = userListString(user.follows);
-  let followedBy = userListString(user.followedBy);
+  let follows = formatUserIdList(user.follows);
+  let followedBy = formatUserIdList(user.followedBy);
   console.log(`Follows: ${follows}`);
   console.log(`Followed by: ${followedBy}`);
 }
@@ -112,7 +116,7 @@ console.log("Users following users who don't follow them back.");
 followNotFollowedBack()
   .forEach(t => {
     if(t.difference.length) {
-      console.log(`${t.name}: ${userListString(t.difference)}`);
+      console.log(`${t.name}: ${formatUserIdList(t.difference)}`);
     }
   });
 console.log("-------------------");
