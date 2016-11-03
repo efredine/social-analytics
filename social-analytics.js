@@ -80,17 +80,13 @@ function followNotFollowedBack() {
 
 // Find reach of a node.
 function reach(u, depth) {
-  var mine = new Set(u.followedBy)
-  if (depth === 0) {
-    return mine;
-  }
-  else {
-    let children = u.followedBy.map(userForId).map(u => reach(u, depth-1));
-    return children.reduce((a, b) => {
-      b.forEach(x => a.add(x));
-      return a;
-    }, mine);
-  }
+  var mine = new Set(u.followedBy);
+  var children = u.followedBy.map(userForId).map(u => new Set(u.followedBy));
+  // find the union of the children and this node
+  return children.reduce((a, b) => {
+    b.forEach(x => a.add(x));
+    return a;
+  }, mine);
 }
 
 // Do a dump of the data so we can see what we got.
@@ -113,7 +109,7 @@ followNotFollowedBack().forEach(t => {
 console.log("-------------------");
 console.log("Reach:")
 _.forEach(data, u => {
-  let r = reach(u, 1);
+  let r = reach(u);
   console.log(`${u.name}: ${r.size}`);
   console.log(r);
 });
