@@ -18,10 +18,10 @@ var data =
            follows: ["f04"]},
    "f06": {name: "Finn",
            age: 25,
-           follows: ["f05"]}}
+           follows: ["f05"]}};
 
 // Calculate the followedBy lists and add the results to the data object.
-function calculateFollowedBy(){
+(function calculateFollowedBy(){
   _.chain(data)
   .map((u, userId) =>
     u.follows.map(followsId => {
@@ -33,8 +33,7 @@ function calculateFollowedBy(){
   .each((followedBySet, followsId) => {
     data[followsId].followedBy = _(followedBySet).pluck("followedBy");
   });
-}
-calculateFollowedBy()
+})();
 
 function userForId(userId) {
   return data[userId];
