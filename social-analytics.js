@@ -60,7 +60,7 @@ function printUser(user, userId) {
 }
 
 function printUsers() {
-  _.forEach(data, (user, userId) => printUser(user, userId));
+  _(data).each((user, userId) => printUser(user, userId));
 }
 
 // apply a function to the expanded version of follows or followedBy and store the results
@@ -74,22 +74,26 @@ function followFilterFunction(field, fn) {
 
 // For each user, find the set of users they follow who haven't followed them back.
 function followNotFollowedBack() {
-  return _.map(data, u => {
-    var followedBySet = new Set(u.followedBy),
-        difference = u.follows.filter(x => !followedBySet.has(x));
-    return Object.assign({difference: difference}, u);
-  });
+  return _(data)
+    .map(u => {
+      var followedBySet = new Set(u.followedBy),
+          difference = u.follows.filter(x => !followedBySet.has(x));
+      return Object.assign({difference: difference}, u);
+    });
 }
 
 // Find reach of a node.
 function reach(u) {
   var mine = new Set(u.followedBy);
-  var children = u.followedBy.map(userForId).map(u => new Set(u.followedBy));
+  var children = u.followedBy
+    .map(userForId)
+    .map(u => new Set(u.followedBy));
   // find the union of the children and this node
-  return children.reduce((a, b) => {
-    b.forEach(x => a.add(x));
-    return a;
-  }, mine);
+  return children
+    .reduce((a, b) => {
+      b.forEach(x => a.add(x));
+      return a;
+    }, mine);
 }
 
 // Do a dump of the data so we can see what we got.
@@ -97,7 +101,7 @@ console.log(data);
 printUsers();
 console.log("-------------------");
 
-var mostFollowed = _.max(data, u => u.followedBy.length);
+var mostFollowed = _(data).max(u => u.followedBy.length);
 var mostFollowedOver30 = followFilterFunction("followedBy", u => u.age > 30).max(t => t.result.length).value();
 var mostFollowingOver30 = followFilterFunction("follows", u => u.age > 30).max(t => t.result.length).value();
 console.log("Most followers:", mostFollowed.name, mostFollowed.followedBy.length);
@@ -106,15 +110,16 @@ console.log("Most following over 30:", mostFollowingOver30.name, mostFollowingOv
 console.log("-------------------");
 
 console.log("Users following users who don't follow them back.");
-followNotFollowedBack().forEach(t => {
-  if(t.difference.length) {
-    console.log(`${t.name}: ${userListString(t.difference)}`);
-  }
-});
+followNotFollowedBack()
+  .forEach(t => {
+    if(t.difference.length) {
+      console.log(`${t.name}: ${userListString(t.difference)}`);
+    }
+  });
 console.log("-------------------");
 
 console.log("Reach:")
-_.forEach(data, u => {
+_(data).forEach(u => {
   let r = reach(u);
   console.log(`${u.name}: ${r.size}`);
   console.log(r);
