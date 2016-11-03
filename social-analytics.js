@@ -71,11 +71,11 @@ var mostFollowingOver30 = followFilter("follows", u => u.age > 30).max(t => t[1]
 
 // For each user, find the set of users they follow who haven't followed them back.
 function followNotFollowedBack() {
-  return _.chain(data).map(u => {
+  return _.map(data, u => {
     var followedBySet = new Set(u.followedBy),
         difference = u.follows.filter(x => !followedBySet.has(x));
     return [u, difference];
-  }).value();
+  });
 }
 
 // Find reach of a node.
