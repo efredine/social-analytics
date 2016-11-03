@@ -70,7 +70,7 @@ function printUsers() {
 function followFilterFunction(field, fn) {
   return _.chain(data)
     .map((u, userId) => {
-      let result = u[field].map(userForId).filter(u => fn(u));
+      let result = usersFromIdList(u[field]).filter(u => fn(u));
       return Object.assign({userId: userId, result:result}, u);
     });
 }
@@ -88,8 +88,7 @@ function followNotFollowedBack() {
 // Find reach of a node.
 function reach(u) {
   var mine = new Set(u.followedBy);
-  var children = u.followedBy
-    .map(userForId)
+  var children = usersFromIdList(u.followedBy)
     .map(u => new Set(u.followedBy));
   // find the union of the children and this node
   return children
