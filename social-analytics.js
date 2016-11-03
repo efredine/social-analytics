@@ -30,6 +30,7 @@ var followedBy = _.reduce(data, (followedBy, user, userId) => {
     return followedBy;
   }, {});
 
+// add followed by arrays to the data object
 _.forEach(followedBy, (followers, userId) => {
   data[userId]["followedBy"] = followers;
 });
@@ -58,7 +59,7 @@ function printUsers() {
 }
 
 function followFilter(field, fn) {
-  return _.chain(data).map(u => {3
+  return _.chain(data).map(u => {
     return [u, u[field].map(userForId).filter(u => fn(u))]
   });
 }
@@ -87,4 +88,25 @@ followNotFollowedBack().forEach(t => {
   if(t[1].length) {
     console.log(`${t[0].name}: ${userListString(t[1])}`);
   }
+});
+
+function reach(u, depth) {
+  var mine = new Set(u.followedBy)
+  if (depth === 0) {
+    return mine;
+  }
+  else {
+    let children = u.followedBy.map(userForId).map(u => reach(u, depth-1));
+    return children.reduce((a, b) => {
+      b.forEach(x => a.add(x));
+      return a;
+    }, mine);
+  }
+}
+console.log("-------------------");
+console.log("Reach:")
+_.forEach(data, u => {
+  let r = reach(u, 1);
+  console.log(`${u.name}: ${r.size}`);
+  console.log(r);
 });
