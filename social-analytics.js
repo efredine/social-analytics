@@ -20,20 +20,21 @@ var data =
            age: 25,
            follows: ["f05"]}}
 
-var followedBy = _.reduce(data, (followedBy, user, userId) => {
-  user.follows.forEach(followsId => {
-      if(!followedBy[followsId]) {
-        followedBy[followsId] = [];
-      }
-      followedBy[followsId].push(userId);
-    });
-    return followedBy;
-  }, {});
-
-// add followed by arrays to the data object
-_.forEach(followedBy, (followers, userId) => {
-  data[userId]["followedBy"] = followers;
-});
+// Calculate the followedBy lists and add the results to the data object.
+function calculateFollowedBy(){
+  _.chain(data)
+  .map((u, userId) =>
+    u.follows.map(followsId => {
+      return {followsId: followsId, followedBy: userId};
+    })
+  )
+  .flatten()
+  .groupBy("followsId")
+  .each((followedBySet, followsId) => {
+    data[followsId].followedBy = _(followedBySet).pluck("followedBy");
+  });
+}
+calculateFollowedBy();
 
 function userForId(userId) {
   return data[userId];
