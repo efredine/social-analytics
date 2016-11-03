@@ -40,19 +40,23 @@ function userForId(userId) {
   return data[userId];
 }
 
+function formatUser(name, id) {
+  return `${name}(${id})`;
+}
+
 function userListString(userIds) {
-  var names = userIds.map(userForId).map(a => a.name);
-  return _.zip(userIds, names).map(t => `${t[1]}(${t[0]})`).join(", ");
+  return userIds
+    .map(id => Object.assign({userId: id}, userForId(id)))
+    .map(u => formatUser(u.name, u.userId))
+    .join(", ");
 }
 
 function printUser(user, userId) {
-  if(user) {
-    console.log(`${user.name}(${userId}) ---------------`);
-    let follows = userListString(user.follows);
-    let followedBy = userListString(user.followedBy);
-    console.log(`Follows: ${follows}`);
-    console.log(`Followed by: ${followedBy}`);
-  }
+  console.log(`${formatUser(user.name, userId)} ----------------`);
+  let follows = userListString(user.follows);
+  let followedBy = userListString(user.followedBy);
+  console.log(`Follows: ${follows}`);
+  console.log(`Followed by: ${followedBy}`);
 }
 
 function printUsers() {
@@ -67,7 +71,6 @@ function followFilterFunction(field, fn) {
       return Object.assign({userId: userId, result:result}, u);
     });
 }
-
 
 // For each user, find the set of users they follow who haven't followed them back.
 function followNotFollowedBack() {
