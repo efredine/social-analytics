@@ -58,23 +58,18 @@ function printUsers() {
   _.forEach(data, (user, userId) => printUser(user, userId));
 }
 
+// apply a filter to the follows or followedBy filter
 function followFilter(field, fn) {
   return _.chain(data).map(u => {
     return [u, u[field].map(userForId).filter(u => fn(u))]
   });
 }
 
-console.log(data);
-printUsers();
 var mostFollowed = _.max(data, u => u.followedBy.length);
 var mostFollowedOver30 = followFilter("followedBy", u => u.age > 30).max(t => t[1].length).value();
 var mostFollowingOver30 = followFilter("follows", u => u.age > 30).max(t => t[1].length).value();
 
-console.log("-------------------");
-console.log("Most followers:", mostFollowed.name, mostFollowed.followedBy.length);
-console.log("Most followers over 30:", mostFollowedOver30[0].name, mostFollowedOver30[1].length);
-console.log("Most following over 30:", mostFollowingOver30[0].name, mostFollowingOver30[1].length);
-
+// For each user, find the set of users they follow who haven't followed them back.
 function followNotFollowedBack() {
   return _.chain(data).map(u => {
     var followedBySet = new Set(u.followedBy),
@@ -82,14 +77,8 @@ function followNotFollowedBack() {
     return [u, difference];
   }).value();
 }
-console.log("-------------------");
-console.log("Users following users who don't follow them back.");
-followNotFollowedBack().forEach(t => {
-  if(t[1].length) {
-    console.log(`${t[0].name}: ${userListString(t[1])}`);
-  }
-});
 
+// Find reach of a node.
 function reach(u, depth) {
   var mine = new Set(u.followedBy)
   if (depth === 0) {
@@ -103,6 +92,24 @@ function reach(u, depth) {
     }, mine);
   }
 }
+
+// Do a dump of the data so we can see what we got.
+console.log(data);
+printUsers();
+
+console.log("-------------------");
+console.log("Most followers:", mostFollowed.name, mostFollowed.followedBy.length);
+console.log("Most followers over 30:", mostFollowedOver30[0].name, mostFollowedOver30[1].length);
+console.log("Most following over 30:", mostFollowingOver30[0].name, mostFollowingOver30[1].length);
+
+console.log("-------------------");
+console.log("Users following users who don't follow them back.");
+followNotFollowedBack().forEach(t => {
+  if(t[1].length) {
+    console.log(`${t[0].name}: ${userListString(t[1])}`);
+  }
+});
+
 console.log("-------------------");
 console.log("Reach:")
 _.forEach(data, u => {
