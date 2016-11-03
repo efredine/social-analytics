@@ -73,3 +73,18 @@ console.log("-------------------");
 console.log("Most followers:", mostFollowed.name, mostFollowed.followedBy.length);
 console.log("Most followers over 30:", mostFollowedOver30[0].name, mostFollowedOver30[1].length);
 console.log("Most following over 30:", mostFollowingOver30[0].name, mostFollowingOver30[1].length);
+
+function followNotFollowedBack() {
+  return _.chain(data).map(u => {
+    var followedBySet = new Set(u.followedBy),
+        difference = u.follows.filter(x => !followedBySet.has(x));
+    return [u, difference];
+  }).value();
+}
+console.log("-------------------");
+console.log("Users following users who don't follow them back.");
+followNotFollowedBack().forEach(t => {
+  if(t[1].length) {
+    console.log(`${t[0].name}: ${userListString(t[1])}`);
+  }
+});
