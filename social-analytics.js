@@ -79,8 +79,8 @@ function followFilterFunction(field, fn) {
 function followNotFollowedBack() {
   return _(data)
     .map(u => {
-      var followedBySet = new Set(u.followedBy),
-          difference = u.follows.filter(x => !followedBySet.has(x));
+      var followedBySet = new Set(u.followedBy);
+      var difference = u.follows.filter(x => !followedBySet.has(x));
       return Object.assign({difference: difference}, u);
     });
 }
