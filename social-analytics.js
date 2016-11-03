@@ -34,7 +34,7 @@ function calculateFollowedBy(){
     data[followsId].followedBy = _(followedBySet).pluck("followedBy");
   });
 }
-calculateFollowedBy();
+calculateFollowedBy()
 
 function userForId(userId) {
   return data[userId];
@@ -59,16 +59,15 @@ function printUsers() {
   _.forEach(data, (user, userId) => printUser(user, userId));
 }
 
-// apply a filter to the follows or followedBy filter
-function followFilter(field, fn) {
-  return _.chain(data).map(u => {
-    return [u, u[field].map(userForId).filter(u => fn(u))]
-  });
+// apply a function to the expanded version of follows or followedBy and store the results
+function followFilterFunction(field, fn) {
+  return _.chain(data)
+    .map((u, userId) => {
+      let result = u[field].map(userForId).filter(u => fn(u));
+      return Object.assign({userId: userId, result:result}, u);
+    });
 }
 
-var mostFollowed = _.max(data, u => u.followedBy.length);
-var mostFollowedOver30 = followFilter("followedBy", u => u.age > 30).max(t => t[1].length).value();
-var mostFollowingOver30 = followFilter("follows", u => u.age > 30).max(t => t[1].length).value();
 
 // For each user, find the set of users they follow who haven't followed them back.
 function followNotFollowedBack() {
@@ -93,21 +92,24 @@ function reach(u, depth) {
 // Do a dump of the data so we can see what we got.
 console.log(data);
 printUsers();
-
 console.log("-------------------");
+
+var mostFollowed = _.max(data, u => u.followedBy.length);
+var mostFollowedOver30 = followFilterFunction("followedBy", u => u.age > 30).max(t => t.result.length).value();
+var mostFollowingOver30 = followFilterFunction("follows", u => u.age > 30).max(t => t.result.length).value();
 console.log("Most followers:", mostFollowed.name, mostFollowed.followedBy.length);
-console.log("Most followers over 30:", mostFollowedOver30[0].name, mostFollowedOver30[1].length);
-console.log("Most following over 30:", mostFollowingOver30[0].name, mostFollowingOver30[1].length);
-
+console.log("Most followers over 30:", mostFollowedOver30.name, mostFollowedOver30.userId, mostFollowedOver30.result.length);
+console.log("Most following over 30:", mostFollowingOver30.name, mostFollowingOver30.result.length);
 console.log("-------------------");
+
 console.log("Users following users who don't follow them back.");
 followNotFollowedBack().forEach(t => {
   if(t[1].length) {
     console.log(`${t[0].name}: ${userListString(t[1])}`);
   }
 });
-
 console.log("-------------------");
+
 console.log("Reach:")
 _.forEach(data, u => {
   let r = reach(u);
