@@ -74,12 +74,12 @@ function followNotFollowedBack() {
   return _.map(data, u => {
     var followedBySet = new Set(u.followedBy),
         difference = u.follows.filter(x => !followedBySet.has(x));
-    return [u, difference];
+    return Object.assign({difference: difference}, u);
   });
 }
 
 // Find reach of a node.
-function reach(u, depth) {
+function reach(u) {
   var mine = new Set(u.followedBy);
   var children = u.followedBy.map(userForId).map(u => new Set(u.followedBy));
   // find the union of the children and this node
@@ -104,8 +104,8 @@ console.log("-------------------");
 
 console.log("Users following users who don't follow them back.");
 followNotFollowedBack().forEach(t => {
-  if(t[1].length) {
-    console.log(`${t[0].name}: ${userListString(t[1])}`);
+  if(t.difference.length) {
+    console.log(`${t.name}: ${userListString(t.difference)}`);
   }
 });
 console.log("-------------------");
