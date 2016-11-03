@@ -57,11 +57,14 @@ function printUsers() {
   _.forEach(data, (user, userId) => printUser(user, userId));
 }
 
-function mostFollowers() {
-  return _.reduce(data, (a, b) => a.followedBy.length > b.followedBy.length ? a : b);
-}
-
 console.log(data);
 printUsers();
-var mostFollowed = mostFollowers();
+var mostFollowed = _.max(data, u => u.followedBy.length);
+var mostFollowedOver30 = _.max(data, u => {
+  return u.followedBy.map(userForId).filter(u => u.age > 30).length;
+});
+
 console.log("Most followers:", mostFollowed.name, mostFollowed.followedBy.length);
+console.log(mostFollowedOver30);
+console.log("Most followers over 30:", mostFollowedOver30.name, mostFollowedOver30.followedBy.map(userForId).filter(u => u.age > 30).length);
+
