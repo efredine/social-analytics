@@ -1,39 +1,49 @@
-"use strict";
 var _ = require('underscore');
-var data =
-  {"f01": {name: "Alice",
-           age: 15,
-           follows: ["f02", "f03", "f04"]},
-   "f02": {name: "Bob",
-           age: 20,
-           follows: ["f05", "f06"]},
-   "f03": {name: "Charlie",
-           age: 35,
-           follows: ["f01", "f04", "f06"]},
-   "f04": {name: "Debbie",
-           age: 40,
-           follows: ["f01", "f02", "f03", "f05", "f06"]},
-   "f05": {name: "Elizabeth",
-           age: 45,
-           follows: ["f04"]},
-   "f06": {name: "Finn",
-           age: 25,
-           follows: ["f05"]}};
+var data = {
+  "f01": {
+    name: "Alice",
+    age: 15,
+    follows: ["f02", "f03", "f04"]
+  },
+  "f02": {
+    name: "Bob",
+    age: 20,
+    follows: ["f05", "f06"]
+  },
+  "f03": {
+    name: "Charlie",
+    age: 35,
+    follows: ["f01", "f04", "f06"]
+  },
+  "f04": {
+    name: "Debbie",
+    age: 40,
+    follows: ["f01", "f02", "f03", "f05", "f06"]
+  },
+  "f05": {
+    name: "Elizabeth",
+    age: 45,
+    follows: ["f04"]
+  },
+  "f06": {
+    name: "Finn",
+    age: 25,
+    follows: ["f05"]
+  }
+};
 
 // Calculate the followedBy lists and add the results to the data object.
-(function calculateFollowedBy(){
-  _.chain(data)
-  .map((u, userId) =>
-    u.follows.map(followsId => {
-      return {followsId: followsId, followedBy: userId};
-    })
-  )
-  .flatten()
-  .groupBy("followsId")
-  .each((followedBySet, followsId) => {
-    data[followsId].followedBy = _(followedBySet).pluck("followedBy");
+_.chain(data)
+.map((u, userId) => {
+  return u.follows.map(followsId => {
+    return {followsId: followsId, followedBy: userId};
   });
-})();
+})
+.flatten()
+.groupBy("followsId")
+.each((followedBySet, followsId) => {
+  data[followsId].followedBy = _(followedBySet).pluck("followedBy");
+});
 
 function userForId(userId) {
   return data[userId];
@@ -119,7 +129,7 @@ followNotFollowedBack()
   });
 console.log("-------------------");
 
-console.log("Reach:")
+console.log("Reach:");
 _(data).forEach(u => {
   let r = reach(u);
   console.log(`${u.name}: ${r.size}`);
